@@ -14,15 +14,6 @@ var photoPostArr = (function(){
     return function(){
         this.postArray = [];
 
-        let isContain = function(arr1, arr2){
-            for(let i in arr2){
-                if(arr1.indexOf(arr[i]) == -1){
-                    return false;
-                }
-            }
-            return true;
-        };
-
         this.getPhotoPost = function(id){
             for(var i in this.postArray){
                 if(id == this.postArray[i].id){
