@@ -3,7 +3,7 @@ var image_box = function(photoPost){
     for(let i = 0 ; i < photoPost.arrhash.length; i++){
         buff += "<a class='hashtag' href='#' style= \"font: 25px 'Oswald', sans-serif;\">"+ '#' + photoPost.arrhash[i] + "</a>";
     }
-    return"<div class=\"image-box\">\n" +
+    return"<div class=\"image-box\" id=" + photoPost.id + ">\n" +
         "                    <div class=\"image-head\">\n" +
         "                        <div><h2>"+ photoPost.name + "</h2></div>\n" +
         "                        <img class=\"edit-btn\" src=\"https://image.freepik.com/free-icon/no-translate-detected_318-61160.jpg\"></img>\n" +
@@ -32,7 +32,7 @@ var image_box_without_wrap = function(photoPost){
     for(let i = 0 ; i < photoPost.arrhash.length; i++){
         buff += "<a class='hashtag' href='#' style= \"font: 25px 'Oswald', sans-serif;\">"+ '#' + photoPost.arrhash[i] + "</a>";
     }
-    return "<div class=\"image-head\">\n" +
+    return "<div class=\"image-head\" id=" + photoPost.id + ">\n" +
         "                        <div><h2>"+ photoPost.name + "</h2></div>\n" +
         "                        <img class=\"edit-btn\" src=\"https://image.freepik.com/free-icon/no-translate-detected_318-61160.jpg\"></img>\n" +
         "                        <div></div>\n" +
@@ -43,7 +43,7 @@ var image_box_without_wrap = function(photoPost){
         "                        <img class=\"like-btn\" src=\"http://icons.iconarchive.com/icons/icons8/ios7/512/Messaging-Like-icon.png\"></img>\n" +
         "                        <div></div>\n" +
         "                        <div class=\"like-text\">\n" +
-        "                            <b class=\"like-count\" style=\"font: 25px 'Oswald', sans-serif;\">0 отметок \"Нравится\"</b>\n" +
+        "                            <b class=\"like-count\"  style=\"font: 25px 'Oswald', sans-serif;\">" +photoPost.likers.length+ " отметок \"Нравится\"</b>\n" +
         "                        </div>\n" +
         "                    </div>\n" +
         "                    <div class=\"image-info\">\n" +
@@ -57,6 +57,13 @@ var image_box_without_wrap = function(photoPost){
 var changeCurrentUser = function(userName){
     document.getElementById('header').innerHTML = userName;
     currentUser = userName;
+    //let arr = document.getElementById('staff').getElementsByClassName('image-box');
+    for(let i = 0; i < posts.postArray.length; i++){
+        if(posts.postArray[i].name !== currentUser){
+            document.getElementById(posts.postArray[i].id).children[0].children[1].remove();
+            document.getElementById(posts.postArray[i].id).children[0].children[2].remove();
+        }
+    }
 }
 
 var photoPost = (function(){
@@ -78,7 +85,8 @@ var photoPostArr = (function(){
 
         this.getPhotoPost = function(id){
             for(var i in this.postArray){
-                if(id == this.postArray[i].id){
+                id.toString();
+                if(id === this.postArray[i].id){
                     return this.postArray[i];
                 }
             }
@@ -87,7 +95,7 @@ var photoPostArr = (function(){
 
         this.getPhotoPosts = function(filterConfig, skip = 0, top = 10){
             var buff = [];
-            if(typeof(filterConfig) === 'undefined'){
+            if(typeof(filterConfig) === 'undefined' || filterConfig === null){
                 buff = this.postArray.map((elem)=>elem);
             }
             else{
@@ -140,6 +148,7 @@ var photoPostArr = (function(){
 
         this.removePhotoPost = function(id){
             for(var i in this.postArray){
+                id.toString();
                 if(id === this.postArray[i].id){
                     this.postArray.splice(i, 1);
                     elemArr = document.getElementById('staff').getElementsByClassName('image-box');
@@ -151,8 +160,9 @@ var photoPostArr = (function(){
         };
 
         this.editPhotoPost = function(id, config){
+            id.toString();
             for(var i in this.postArray){
-                if(id == this.postArray[i].id && this.validatePhotoPost(this.postArray[i])){
+                if(id === this.postArray[i].id && this.validatePhotoPost(this.postArray[i])){
                     if(config.photoLink) this.postArray[i].photoLink = config.photoLink;
                     if(config.title) this.postArray[i].title = config.title;
                     if(config.arrhash) this.postArray[i].arrhash = config.arrhash;
@@ -192,6 +202,6 @@ posts.editPhotoPost("6", {
 
 var currentUser = null;
 
-changeCurrentUser("Alex");
+changeCurrentUser("aa");
 
 

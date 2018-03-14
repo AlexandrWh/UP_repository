@@ -74,5 +74,23 @@
     </div>
 </div>
 <script src = "./app.js"></script>
+<script>
+    function like(e){
+        e.preventDefault();
+        if(e.target.getAttribute("like")==="0"){
+            e.target.src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png";
+            e.target.setAttribute("like","1");
+        }
+        else{
+            e.target.src="http://icons.iconarchive.com/icons/icons8/ios7/512/Messaging-Like-icon.png";
+            e.target.setAttribute("like","0");
+        }
+    }
+    let d=document.getElementsByClassName("like-btn");
+    for(let i=0;i<d.length;i++){
+        d[i].setAttribute("like","0");
+        d[i].addEventListener("click",like);
+    }
+</script>
 </body>
 </html>
