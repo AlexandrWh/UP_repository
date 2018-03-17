@@ -85,7 +85,7 @@ var photoPostArr = (function(){
 
         this.getPhotoPost = function(id){
             for(var i in this.postArray){
-                id.toString();
+                id = id.toString();
                 if(id === this.postArray[i].id){
                     return this.postArray[i];
                 }
@@ -95,7 +95,7 @@ var photoPostArr = (function(){
 
         this.getPhotoPosts = function(filterConfig, skip = 0, top = 10){
             var buff = [];
-            if(typeof(filterConfig) === 'undefined' || filterConfig === null){
+            if(!filterConfig){
                 buff = this.postArray.map((elem)=>elem);
             }
             else{
@@ -148,7 +148,7 @@ var photoPostArr = (function(){
 
         this.removePhotoPost = function(id){
             for(var i in this.postArray){
-                id.toString();
+                id = id.toString();
                 if(id === this.postArray[i].id){
                     this.postArray.splice(i, 1);
                     elemArr = document.getElementById('staff').getElementsByClassName('image-box');
@@ -160,7 +160,7 @@ var photoPostArr = (function(){
         };
 
         this.editPhotoPost = function(id, config){
-            id.toString();
+            id = id.toString();
             for(var i in this.postArray){
                 if(id === this.postArray[i].id && this.validatePhotoPost(this.postArray[i])){
                     if(config.photoLink) this.postArray[i].photoLink = config.photoLink;
