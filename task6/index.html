@@ -13,51 +13,11 @@
     </div>
     <div class="wrap-staff">
         <div class="content">
-            <div class="side-bar">
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-                <div class = "side-bar-element">
-                    <h1>типо меню</h1>
-                </div>
-            </div>
+            <div class="side-bar"></div>
             <div class="staff" id="staff">
-
+                <div class="download"><h2>More...</h2></div>
             </div>
-            <div class="find">
-                <div class = "find-notes">
-                    <h2>Filter</h2>
-                    <input type="search" placeholder="Search...">
-                </div>
-                <div class = "find-from">
-                    <h2>From</h2>
-                    <input type="date" name="calendar" value="2012-06-01"
-                           max="2018-03-03" min="2018-01-01">
-                </div>
-                <div class = "find-to">
-                    <h2>To</h2>
-                    <input type="date" name="calendar" value="2012-06-01"
-                           max="2018-03-03" min="2018-01-01">
-                </div>
-                <div class = "find-add">
-                    Добавить пост
-                </div>
-            </div>
+            <div class="find"></div>
         </div>
         <div class="footer-wrap">
             <div id="footer">
@@ -74,108 +34,8 @@
         </div>
     </div>
 </div>
-<script src = "./app.js"></script>
-<script>
-    let arr = JSON.parse(localStorage.getItem('posts'));
-    for(let i = 0 ; i < arr.length; i++){
-        document.getElementById('staff').innerHTML += image_box(arr[i]);
-    }
-    function like(e){
-        e.preventDefault();
-        if(e.target.getAttribute("like")==="0"){
-            e.target.src="https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678087-heart-512.png";
-            e.target.setAttribute("like","1");
-        }
-        else{
-            e.target.src="http://icons.iconarchive.com/icons/icons8/ios7/512/Messaging-Like-icon.png";
-            e.target.setAttribute("like","0");
-        }
-    }
-    function delet(e){
 
-        if(localStorage.getItem('currentUser') !== posts.getPhotoPost(e.target.id).name) return;
-        posts.postArray = JSON.parse(localStorage.getItem('posts'));
-        let id = e.target.id;
-        posts.removePhotoPost(id);
-        localStorage.setItem('posts',JSON.stringify(posts.postArray));
-    }
-    function logoff_logon(e){
-        user = localStorage.getItem('currentUser');
-        if(user !== 'null'){
-            localStorage.setItem('currentUser', 'null');
-            document.getElementsByClassName('side-bar')[0].remove();
-            document.getElementsByClassName('find')[0].remove();
-            document.getElementById('staff').innerHTML = "";
-            document.getElementById('header').innerHTML = "";
-            document.getElementsByClassName('header-width-limiter')[0].innerHTML = "<input type=\"input_name\" id=\"login_name\" placeholder=\"Your name?\">";
-        }
-        else{
-            user = document.getElementById('login_name').value;
-            let i = JSON.parse(localStorage.getItem('users')).indexOf(user);
-            if(i != -1){
-                user = JSON.parse(localStorage.getItem('users'))[i];
-                localStorage.setItem('currentUser', user);
-                document.getElementsByClassName('content')[0].innerHTML = "<div class=\"side-bar\">\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "                <div class = \"side-bar-element\">\n" +
-                    "                    <h1>типо меню</h1>\n" +
-                    "                </div>\n" +
-                    "            </div>\n" +
-                    "            <div class=\"staff\" id=\"staff\">\n" +
-                    "\n" +
-                    "            </div>\n" +
-                    "            <div class=\"find\">\n" +
-                    "                <div class = \"find-notes\">\n" +
-                    "                    <h2>Filter</h2>\n" +
-                    "                    <input type=\"search\" placeholder=\"Search...\">\n" +
-                    "                </div>\n" +
-                    "                <div class = \"find-from\">\n" +
-                    "                    <h2>From</h2>\n" +
-                    "                    <input type=\"date\" name=\"calendar\" value=\"2012-06-01\"\n" +
-                    "                           max=\"2018-03-03\" min=\"2018-01-01\">\n" +
-                    "                </div>\n" +
-                    "                <div class = \"find-to\">\n" +
-                    "                    <h2>To</h2>\n" +
-                    "                    <input type=\"date\" name=\"calendar\" value=\"2012-06-01\"\n" +
-                    "                           max=\"2018-03-03\" min=\"2018-01-01\">\n" +
-                    "                </div>\n" +
-                    "                <div class = \"find-add\">\n" +
-                    "                    Добавить пост\n" +
-                    "                </div>\n" +
-                    "            </div>";
-                let arr = JSON.parse(localStorage.getItem('posts'));
-                for(let i = 0 ; i < arr.length; i++){
-                    document.getElementById('staff').innerHTML += image_box(arr[i]);
-                }
-                document.getElementsByClassName('header-width-limiter')[0].innerHTML = user;
-            }
-        }
-    }
-    let lk=document.getElementsByClassName("like-btn");
-    let d=document.getElementsByClassName("delete-btn");
-    document.getElementsByClassName("menu-btn")[0].addEventListener('click', logoff_logon);
-    for(let i=0;i<d.length;i++){
-        lk[i].setAttribute("like","0");
-        lk[i].addEventListener("click",like);
-        d[i].addEventListener("click", delet);
-    }
-</script>
+<script src = "./app.js"></script>
+<script src = "./events.js"></script>
 </body>
 </html>

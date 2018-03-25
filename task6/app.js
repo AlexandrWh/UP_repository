@@ -125,7 +125,7 @@ var photoPostArr = (function(){
         this.addPhotoPost = function(photoPost){
             if(this.validatePhotoPost(photoPost)){
                 this.postArray.push(photoPost);
-                document.getElementById("staff").innerHTML += image_box(photoPost);
+                document.getElementById("staff").innerHTML = image_box(photoPost) + document.getElementById("staff").innerHTML;
                 //alert(image_box(photoPost).length);
             }
             else{
@@ -166,7 +166,6 @@ var photoPostArr = (function(){
 
 let posts = new photoPostArr();
 
-localStorage.setItem('currentUser', 'aa');
-document.getElementsByClassName('header-width-limiter')[0].innerHTML = 'aa';
+localStorage.setItem('currentL', '10');
 
 
