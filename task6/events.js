@@ -1,6 +1,8 @@
 setUser(localStorage.getItem('currentUser'));
 document.getElementsByClassName("menu-btn")[0].addEventListener('click', logoff_logon);
 
+var id;
+
 function setUser(user){
     if(user === 'null'){
         document.getElementsByClassName('content')[0].innerHTML = "<div class=\"staff\" id=\"staff\"></div>\n"+
@@ -88,12 +90,14 @@ function setUser(user){
             }
             let lk=document.getElementsByClassName("like-btn");
             let d=document.getElementsByClassName("delete-btn");
+            let e=document.getElementsByClassName("edit-btn");
             for(let i=0;i<lk.length;i++){
                 lk[i].setAttribute("like","0");
                 lk[i].addEventListener("click",like);
             }
             for(let i=0;i<d.length;i++){
                 d[i].addEventListener("click",delet);
+                e[i].addEventListener("click",edit);
             }
             document.getElementsByClassName('find-go')[0].addEventListener('click', filter);
             document.getElementsByClassName('find-add')[0].addEventListener('click', add);
@@ -105,21 +109,40 @@ function setUser(user){
 }
 
 function filter(){
-    let dateFrom = new Date(document.getElementById('dateFrom').value);
-    let dateTo = new Date(document.getElementById('dateTo').value);
+    user = localStorage.getItem('currentUser');
+    let dateFrom_ = new Date(document.getElementById('dateFrom').value);
+    let dateTo_ = new Date(document.getElementById('dateTo').value);
     let name = document.getElementById('filter-name').value;
     let arrhash = document.getElementById('filter-hash').value.split('#').slice(1);
-    console.log(dateFrom);
-    console.log(dateTo);
-    console.log(name);
-    console.log(arrhash);
     posts.postArray = JSON.parse(localStorage.getItem('posts'));
-    console.log(posts.getPhotoPosts({
-        dateFrom: dateFrom,
-        dateTo: dateTo,
+    let arr = posts.getPhotoPosts({
+        dateFrom: dateFrom_,
+        dateTo: dateTo_,
         name: name,
         arrhash: arrhash
-    }));
+    });
+    document.getElementById('staff').innerHTML = "";
+    for(let i = 0 ; i < arr.length ;i++){
+        document.getElementById('staff').innerHTML += image_box(arr[i]);
+    }
+    let col = document.getElementsByClassName('image-box');
+    for(let i = 0 ;i < col.length; i++){
+        if(arr[i].name !== user){
+            col[i].children[0].children[1].remove();
+            col[i].children[0].children[2].remove();
+        }
+    }
+    let lk=document.getElementsByClassName("like-btn");
+    let d=document.getElementsByClassName("delete-btn");
+    let e=document.getElementsByClassName("edit-btn");
+    for(let i=0;i<lk.length;i++){
+        lk[i].setAttribute("like","0");
+        lk[i].addEventListener("click",like);
+    }
+    for(let i=0;i<d.length;i++){
+        d[i].addEventListener("click",delet);
+        e[i].addEventListener("click",edit);
+    }
 }
 
 function like(e){
@@ -136,7 +159,7 @@ function like(e){
 
 function delet(e){
     posts.postArray = JSON.parse(localStorage.getItem('posts'));
-    let id = e.target.id;
+    id = e.target.id;
     posts.removePhotoPost(id);
     localStorage.setItem('posts',JSON.stringify(posts.postArray));
 }
@@ -144,6 +167,7 @@ function delet(e){
 function more() {
     let arr = JSON.parse(localStorage.getItem('posts'));
     let currentL = JSON.parse(localStorage.getItem('currentL'));
+    let user = localStorage.getItem('currentUser');
     let prevL;
     document.getElementById('staff').lastChild.remove();
     for (let i = currentL; i < Math.min(currentL + 10, arr.length); i++) {
@@ -164,12 +188,14 @@ function more() {
     }
     let lk = document.getElementsByClassName("like-btn");
     let d = document.getElementsByClassName("delete-btn");
+    let e=document.getElementsByClassName("edit-btn");
     for (let i = 0; i < lk.length; i++) {
         lk[i].setAttribute("like", "0");
         lk[i].addEventListener("click", like);
     }
     for (let i = 0; i < d.length; i++) {
         d[i].addEventListener("click", delet);
+        e[i].addEventListener("click",edit);
     }
 }
 
@@ -193,7 +219,7 @@ function add(){
                                                                     "<div><input type=\"description\" id=\"description\" placeholder=\"description...\"></div>" +
                                                                     "<div><input type=\"hashtags\" id=\"hashtags\" placeholder=\"hashtags...\"></div>" +
                                                                     "<div><input type=\"photoLink\" id=\"photoLink\" placeholder=\"photolink...\"></div>" +
-                                                                    "<div id=\"addPost\"></div>" +
+                                                                    "<div id=\"addPost\" style=\"width: 400px\"><h2>Do it!</h2></div>" +
                                                                 "</div>";
     document.getElementsByClassName("menu-btn")[0].addEventListener('click', logoff_logon);
     document.getElementById("addPost").addEventListener('click', addPost);
@@ -204,14 +230,45 @@ function addPost(){
     let photoLink_ = document.getElementById("photoLink").value;
     let post = [{
         name: localStorage.getItem('currentUser'),
-        id: "1000",
+        id: localStorage.getItem('id'),
         date: new Date(),
         photoLink: photoLink_,
         title: description,
         arrhash: hashtags,
         likers: []
     }];
+    localStorage.setItem('id', 1 + JSON.parse(localStorage.getItem('id')));
     let arr = post.concat(JSON.parse(localStorage.getItem('posts')));
     localStorage.setItem('posts', JSON.stringify(arr));
-    setUser(localStorage.getItem('currentUser'))
+    setUser(localStorage.getItem('currentUser'));
+}
+
+function edit(e){
+    id = e.target.id;
+    document.getElementsByClassName('content')[0].innerHTML =   "<div class=\"staff\" id=\"staff\"></div>\n" +
+        "<div style=\"padding: 50px calc(50% - 200px) 0 calc(50% - 200px);" +
+        "display: grid;" +
+        "grid-template-rows: 35px 250px 50px 50px 50px\">" +
+        "<div><h2>Post information...</h2></div>" +
+        "<div><input type=\"description\" id=\"description\" placeholder=\"description...\"></div>" +
+        "<div><input type=\"hashtags\" id=\"hashtags\" placeholder=\"hashtags...\"></div>" +
+        "<div><input type=\"photoLink\" id=\"photoLink\" placeholder=\"photolink...\"></div>" +
+        "<div id=\"addPost\" style=\"width: 400px\"><h2>Do it!</h2></div>" +
+        "</div>";
+    document.getElementsByClassName("menu-btn")[0].addEventListener('click', logoff_logon);
+    document.getElementById("addPost").addEventListener('click', edit_go);
+}
+function edit_go(){
+    let description = document.getElementById("description").value;
+    let hashtags = document.getElementById("hashtags").value.split('#').slice(1);
+    let photoLink_ = document.getElementById("photoLink").value;
+    posts.postArray = JSON.parse(localStorage.getItem('posts'));
+    let post = {
+        photoLink: photoLink_,
+        title: description,
+        arrhash: hashtags
+    };
+    posts.editPhotoPost(id, post);
+    localStorage.setItem('posts', JSON.stringify(posts.postArray));
+    setUser(localStorage.getItem('currentUser'));
 }

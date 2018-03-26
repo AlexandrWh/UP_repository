@@ -6,7 +6,7 @@ var image_box = function(photoPost){
     return"<div class=\"image-box\" id=" + photoPost.id + ">\n" +
         "                    <div class=\"image-head\">\n" +
         "                        <div><h2>"+ photoPost.name + "</h2></div>\n" +
-        "                        <img class=\"edit-btn\" src=\"https://image.freepik.com/free-icon/no-translate-detected_318-61160.jpg\"></img>\n" +
+        "                        <img class=\"edit-btn\" id=" + photoPost.id + " src=\"https://image.freepik.com/free-icon/no-translate-detected_318-61160.jpg\"></img>\n" +
         "                        <div></div>\n" +
         "                        <img class=\"delete-btn\" id=" + photoPost.id + " src=\"https://www.shareicon.net/data/2016/09/01/822390_delete_512x512.png\"></img>\n" +
         "                    </div>\n" +
@@ -25,33 +25,6 @@ var image_box = function(photoPost){
         "                        </span>\n" +
         "                    </div>\n" +
         "                </div>\n"
-}
-
-var image_box_without_wrap = function(photoPost){
-    let buff ="";
-    for(let i = 0 ; i < photoPost.arrhash.length; i++){
-        buff += "<a class='hashtag' href='#' style= \"font: 25px 'Oswald', sans-serif;\">"+ '#' + photoPost.arrhash[i] + "</a>";
-    }
-    return "<div class=\"image-head\" id=" + photoPost.id + ">\n" +
-        "                        <div><h2>"+ photoPost.name + "</h2></div>\n" +
-        "                        <img class=\"edit-btn\" src=\"https://image.freepik.com/free-icon/no-translate-detected_318-61160.jpg\"></img>\n" +
-        "                        <div></div>\n" +
-        "                        <img class=\"delete-btn\" src=\"https://www.shareicon.net/data/2016/09/01/822390_delete_512x512.png\"></img>\n" +
-        "                    </div>\n" +
-        "                    <img class=\"image-staff\" src=" + photoPost.photoLink + "></img>\n" +
-        "                    <div class=\"image-like\">\n" +
-        "                        <img class=\"like-btn\" src=\"http://icons.iconarchive.com/icons/icons8/ios7/512/Messaging-Like-icon.png\"></img>\n" +
-        "                        <div></div>\n" +
-        "                        <div class=\"like-text\">\n" +
-        "                            <b class=\"like-count\"  style=\"font: 25px 'Oswald', sans-serif;\">" +photoPost.likers.length+ " отметок \"Нравится\"</b>\n" +
-        "                        </div>\n" +
-        "                    </div>\n" +
-        "                    <div class=\"image-info\">\n" +
-        "                        <span> <b style=\"font: 25px 'Oswald', sans-serif;\">" + photoPost.name + ':' + "</b>\n" +
-        "                            <span class=\"image-desc\">" + photoPost.title + "</span>\n" +
-        buff +
-        "                        </span>\n" +
-        "</div>\n";
 }
 
 var photoPost = (function(){
@@ -148,14 +121,11 @@ var photoPostArr = (function(){
         };
 
         this.editPhotoPost = function(id, config){
-            id = id.toString();
             for(var i in this.postArray){
-                if(id === this.postArray[i].id && this.validatePhotoPost(this.postArray[i])){
+                if(id === this.postArray[i].id){
                     if(config.photoLink) this.postArray[i].photoLink = config.photoLink;
                     if(config.title) this.postArray[i].title = config.title;
                     if(config.arrhash) this.postArray[i].arrhash = config.arrhash;
-                    document.getElementById('staff').
-                    getElementsByClassName('image-box')[i].innerHTML = image_box_without_wrap(this.postArray[i]);
                     return true;
                 }
             }
@@ -167,5 +137,7 @@ var photoPostArr = (function(){
 let posts = new photoPostArr();
 
 localStorage.setItem('currentL', '10');
-
-
+if(!JSON.parse(localStorage.getItem('posts'))){
+    localStorage.setItem('posts', '[]');
+    localStorage.setItem('id', '1');
+}
