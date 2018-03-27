@@ -141,3 +141,5 @@ if(!JSON.parse(localStorage.getItem('posts'))){
     localStorage.setItem('posts', '[]');
     localStorage.setItem('id', '1');
 }
+
+localStorage.setItem('users', JSON.stringify(['a', 'aa', 'aaa', 'aaaa', 'aaaaa', 'aaaaaa', 'aaaaaaa']));

@@ -15,7 +15,7 @@ function setUser(user){
     }
     else{
         let i = JSON.parse(localStorage.getItem('users')).indexOf(user);
-        if(i != -1){
+        if(i !== -1){
             user = JSON.parse(localStorage.getItem('users'))[i];
             localStorage.setItem('currentUser', user);
             document.getElementsByClassName('content')[0].innerHTML = "<div class=\"side-bar\">\n" +
