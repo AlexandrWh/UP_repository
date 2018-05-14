@@ -1,0 +1,15 @@
+[
+    {
+        "email": "AlexandrWh@mail.ru",
+        "name": "Alexander",
+        "password": "11111",
+        "avatarLink": "avatar.jpg",
+        "id": "'1"
+    },
+    {
+        "email": "admin@mail.ru",
+        "password": "admin",
+        "name": "admin",
+        "id": "0"
+    }
+]
