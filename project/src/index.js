@@ -1,9 +1,11 @@
+//import { PhotoPosts as PhotoPostsModel } from './models';
+
 function isString(s) {
     return typeof s === 'string' || s instanceof String;
 }
 
 /*PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel*/
-let PhotoPostsModel = (function () {
+let PhotoPostsModel = (function(){
     return class PhotoPosts {
         constructor() {
             this.photoPosts = [];
@@ -16,6 +18,12 @@ let PhotoPostsModel = (function () {
             return posts;
         }
 
+        /**
+         * @param {number} skip
+         * @param {number} top
+         * @param {{author? : String, fromDate? : Date, toDate? : Date, tags? : [String]}} filterConfig
+         * @returns {[PhotoPost]}
+         */
         getPhotoPosts(skip = 0, top = 10, filterConfig) {
             if (!this.isSorted) {
                 this.photoPosts.sort((p1, p2) => p1.createdAt < p2.createdAt);
@@ -46,16 +54,27 @@ let PhotoPostsModel = (function () {
             return result;
         }
 
+        /**
+         * @param {PhotoPost} post
+         * @returns {Boolean} success / failure
+         */
         addPhotoPost(post) {
             this.photoPosts.push(post);
             this.isSorted = false;
             return post;
         }
 
+        /**
+         * @param {String} id
+         * @returns {PhotoPost | null} Returns post with such id or null if not found.
+         */
         getPhotoPost(id) {
             return this.photoPosts.find(post => post.id === id) || null;
         }
 
+        /**
+         * @returns {Boolean} success / failure
+         */
         editPhotoPost(id, fieldsToEdit) {
             const ind = this.photoPosts.findIndex(post => post.id === id);
             if (ind === -1) {
@@ -65,6 +84,10 @@ let PhotoPostsModel = (function () {
             return true;
         }
 
+        /**
+         * @param {String} id
+         * @returns {Boolean} success / failure
+         */
         removePhotoPost(id) {
             const ind = this.photoPosts.findIndex(post => post.id === id);
             if (ind === -1) {
@@ -79,7 +102,7 @@ let PhotoPostsModel = (function () {
 /*************************************module*****************************************************************/
 
 /*util util util util util util util util util util util util util util util util util util util util*/
-let util = (function () {
+let util = (function (){
     function stringToDOMElement(s) {
         const template = document.createElement('template');
         template.innerHTML = s;
@@ -100,9 +123,14 @@ let util = (function () {
         return wrapper;
     }
 
+    /**
+     *
+     * @param {[Element]} elements
+     * @param {Element} wrapper
+     * @returns {Element} Rendered element.
+     */
     function render(elements, wrapper) {
         if (!Array.isArray(elements)) {
-
             elements = [elements];
         }
 
@@ -110,6 +138,11 @@ let util = (function () {
         return wrapper;
     }
 
+    /**
+     * @param {String} tag
+     * @param {Object} props
+     * @param {[Element]} children
+     */
     function createElement(tag, props, ...children) {
         const element = document.createElement(tag);
         Object.keys(props).forEach((propName) => {
@@ -119,21 +152,19 @@ let util = (function () {
         return element;
     }
 
+    /**
+     *
+     * @param {Node} element
+     * @returns {[Node]} removed children
+     */
     function removeChildren(element) {
-        // console.log(element);
         const children = [];
-        if (element) {
-            while (element.firstChild) {
-                // console.log(1);
-                children.push(element.firstChild);
-                element.removeChild(element.firstChild);
-            }
+        while (element.firstChild) {
+            children.push(element.removeChild(element.firstChild));
         }
-        //   console.log(children);
         return children;
     }
-
-    return {
+    return{
         stringToDOMElement,
         addClassIf,
         renderIf,
@@ -145,28 +176,46 @@ let util = (function () {
 
 })();
 /******************************************************************************************************/
-let state = {};
 
-function getState() {
-    return state;
-}
+/*state state state state state state state state state state state state state state state state*/
+//let state =  (function (){
+    let state = {
 
-function setState(stateUpdate) {
-    state = Object.assign(state, stateUpdate);
-}
+    };
 
+    function getState() {
+        return state;
+    }
+
+    function setState(stateUpdate) {
+        state = Object.assign(state, stateUpdate);
+    }
+
+  //  return{
+  //      state,
+  //      getState,
+  //      setState
+  //  }
+//})();
 /******************************************************************************************************/
 
 /*handle handle handle handle handle handle handle handle handle handle handle handle handle handle */
-let handle = (function () {
+let handle = (function (){
     /*api api api api api api api api api api api api api api api api api api api api api api api api api api api */
-    let api = (function () {
+    let api = (function(){
         //import PhotoPost from './models/PhotoPost';
 
         /*PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost*/
-        let PhotoPost = (function () {
+        let PhotoPost = (function(){
             return class PhotoPost {
-
+                /**
+                 * @param {String} description
+                 * @param {Date} createdAt
+                 * @param {String} author
+                 * @param {String} photoLink
+                 * @param {[String]} tags
+                 * @param {[String]} likes
+                 */
                 constructor({
                                 description,
                                 createdAt,
@@ -189,6 +238,10 @@ let handle = (function () {
                     return this.likes.length;
                 }
 
+                /**
+                 * Like this post. Calling twice with same userName will unlike
+                 * @param {String} userName User who liked this post.
+                 */
                 like(userName) {
                     const ind = this.likes.indexOf(userName);
                     if (ind === -1) {
@@ -198,6 +251,9 @@ let handle = (function () {
                     }
                 }
 
+                /**
+                 * @param {PhotoPost} post
+                 */
                 static validate(post) {
                     return (
                         post instanceof PhotoPost &&
@@ -213,7 +269,6 @@ let handle = (function () {
             }
 
         })();
-
         /*************************************module*****************************************************************/
 
         function buildRequest(url, params = {}) {
@@ -242,7 +297,7 @@ let handle = (function () {
         }
 
         function parsePost(rawPost) {
-            const postObj = Object.assign({}, rawPost, {createdAt: new Date(rawPost.createdAt)});
+            const postObj = Object.assign({}, rawPost, { createdAt: new Date(rawPost.createdAt) });
             return new PhotoPost(postObj);
         }
 
@@ -254,14 +309,14 @@ let handle = (function () {
         }
 
         function getPosts(skip = 0, top = 10, filterConfig = {}) {
-            return fetch(buildRequest('/posts', {top, skip, filterConfig}))
+            return fetch(buildRequest('/posts', { top, skip, filterConfig }))
                 .then(handleErrors)
                 .then(response => response.json())
                 .then(rawPosts => rawPosts.map(rawPost => parsePost(rawPost)));
         }
 
         function likePost(id, user) {
-            return fetch(buildRequest(`/posts/${id}/like`, {user}), {
+            return fetch(buildRequest(`/posts/${id}/like`, { user }), {
                 method: 'PUT',
             })
                 .then(handleErrors)
@@ -270,17 +325,13 @@ let handle = (function () {
         }
 
         function createPost(post) {
-            const data = objectToFormData(post);
-            //console.log(data);
-            //console.log(post);
             return fetch('/posts', {
                 method: 'POST',
-                body: data,
+                body: objectToFormData(post),
             })
                 .then(handleErrors)
                 .then(response => response.json())
                 .then(json => parsePost(json));
-
         }
 
         function updatePost(id, post) {
@@ -306,7 +357,7 @@ let handle = (function () {
                 headers: {
                     'content-type': 'application/json',
                 },
-                body: JSON.stringify({email, password}),
+                body: JSON.stringify({ email, password }),
             }).then((response) => {
                 if (response.ok) {
                     return response.json();
@@ -321,8 +372,7 @@ let handle = (function () {
                 .then(response => response.json())
                 .then(postsRaw => postsRaw.map(rawPost => parsePost(rawPost)));
         }
-
-        return {
+        return{
             getPost,
             getPosts,
             likePost,
@@ -336,24 +386,27 @@ let handle = (function () {
     /*************************************module*****************************************************************/
 
     /*PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts*/
-    let PhotoPosts = (function () {
+    let PhotoPosts = (function(){
+        //import PhotoPost from './PhotoPost';
+        //import PostsNotFound from './PostsNotFound';
 
         /*PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost*/
-        let PhotoPost = (function () {
+        let PhotoPost = (function(){
             //import { stringToDOMElement, addClassIf } from '../util';
             //import handle from '../handlers';
             //import { getState } from '../state';
+            /**
+             * @param {PhotoPostModel} post
+             * @param {Store} store
+             */
 
-            return function PhotoPost({post}) {
-                post.tags = post.tags.toString();
-                post.tags = post.tags.split(",");
-                if (!post.likes) post.likes = [];
-                if (!post.createdAt) post.createdAt = new Date(); // fixed
-                const {user} = getState();
+            return function PhotoPost({ post }) {
+                const { user } = getState();
                 const pad = s => new String(s).padStart(2, '0');
                 const formatDate = date => pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + pad(date.getFullYear() % 100);
                 const makeTag = tag => `<a class="post__tag">${tag}</a>`;
-                const makeTags = tags => tags.reduce((s, tag) => s + makeTag(tag) + ' ', '');
+                const makeTags = tags =>
+                    tags.reduce((s, tag) => s + makeTag(tag) + ' ', '');
                 const isAuthor = user && post.author === user.name;
                 const isLiked = user && post.likes.indexOf(user.name) !== -1;
                 const element = util.stringToDOMElement(`
@@ -413,7 +466,7 @@ let handle = (function () {
         /*************************************module*****************************************************************/
 
         /*PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound*/
-        let PostsNotFound = (function () {
+        let PostsNotFound = (function(){
             //import { stringToDOMElement } from '../util';
 
             return function PostsNotFound() {
@@ -430,7 +483,7 @@ let handle = (function () {
 
         let element;
 
-        function PhotoPosts() {
+        return function PhotoPosts() {
             element = util.stringToDOMElement(`
                  <div class="posts" id="posts">
                  <div></div>
@@ -449,7 +502,7 @@ let handle = (function () {
         PhotoPosts.update = function (id, post) {
             const node = findNode(id);
             if (node) {
-                node.parentNode.replaceChild(PhotoPost({post}), node);
+                node.parentNode.replaceChild(PhotoPost({ post }), node);
             }
         };
 
@@ -461,28 +514,24 @@ let handle = (function () {
         };
 
         PhotoPosts.render = function (posts) {
-            element = document.getElementById('posts');
-            util.removeChildren(element);
+            removeChildren(element);
             const wrapper = document.createElement('div');
             if (posts.length === 0) {
                 wrapper.appendChild(PostsNotFound());
             } else {
                 posts.forEach((post) => {
-                    wrapper.appendChild(PhotoPost({post}));
+                    wrapper.appendChild(PhotoPost({ post }));
                 });
             }
-            //console.log(wrapper);
             element.appendChild(wrapper);
         };
-
-        return PhotoPosts;
 
 
     })();
     /*************************************module*****************************************************************/
 
     /*PageNotFound PageNotFound PageNotFound PageNotFound PageNotFound PageNotFound PageNotFound PageNotFound*/
-    let PageNotFound = (function () {
+    let PageNotFound = (function(){
         return function PageNotFound() {
             return util.stringToDOMElement(`
                   Ooops! Page not found!
@@ -492,23 +541,28 @@ let handle = (function () {
     /*************************************function*****************************************************************/
 
     /*SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn SignIn*/
-    let SignIn = (function () {
+    let SignIn = (function(){
+       // import { stringToDOMElement } from '../util';
+       // import Footer from './Footer';
+      //  import handle from '../handlers';
 
         /*Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer*/
-        let Footer = (function () {
+        let Footer = (function(){
+            //import { stringToDOMElement } from '../util';
 
             return function Footer() {
                 return util.stringToDOMElement(`
     <footer class="footer panel">
       <span class="footer__description bright">
-        Created by Kuzmich Alexandr, 2-nd year student from FAMCS
+        Impression by Simon Karasik,
         <a class="footer__email" href="mailto:senich10@mail.ru">
-            AlexandrWh
+            senich10@mail.ru
         </a>
+        ,&nbsp FAMCS, group 5
       </span>
       <span class="footer__update bright">
         Last update:
-         <span id="update-date">13.05.18</span>
+         <span id="update-date">19.02.18</span>
       </span>
     </footer>
     `.trim());
@@ -531,7 +585,7 @@ let handle = (function () {
             const element = util.stringToDOMElement(`
     <div class="sign-in">
       <div class="sign-in__content">
-        <h1 class="sign-in__header bright">Monogram</h1>
+        <h1 class="sign-in__header bright">Impression</h1>
         ${form}
       </div>
     </div>
@@ -574,18 +628,32 @@ let handle = (function () {
     /*************************************function*****************************************************************/
 
     /*AppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppAppvAppAppAppAppApp*/
-    let App = (function () {
+    let App = (function(){
         /*Content Content Content Content Content Content Content Content Content Content Content Content Content*/
-        let Content = (function () {
+        let Content = (function(){
+            //import { stringToDOMElement } from '../util';
+           // import { getState } from '../state';
+           // import handle from '../handlers';
+           // import PhotoPosts from './PhotoPosts';
+           // import Filter from './Filter';
 
             /*PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts*/
-            let PhotoPosts = (function () {
+            let PhotoPosts = (function(){
+                //import PhotoPost from './PhotoPost';
+                //import PostsNotFound from './PostsNotFound';
 
                 /*PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost*/
-                let PhotoPost = (function () {
+                let PhotoPost = (function(){
+                    //import { stringToDOMElement, addClassIf } from '../util';
+                    //import handle from '../handlers';
+                    //import { getState } from '../state';
+                    /**
+                     * @param {PhotoPostModel} post
+                     * @param {Store} store
+                     */
 
-                    return function PhotoPost({post}) {
-                        const {user} = getState();
+                    return function PhotoPost({ post }) {
+                        const { user } = getState();
                         const pad = s => new String(s).padStart(2, '0');
                         const formatDate = date => pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + pad(date.getFullYear() % 100);
                         const makeTag = tag => `<a class="post__tag">${tag}</a>`;
@@ -650,7 +718,8 @@ let handle = (function () {
                 /*************************************module*****************************************************************/
 
                 /*PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound*/
-                let PostsNotFound = (function () {
+                let PostsNotFound = (function(){
+                    //import { stringToDOMElement } from '../util';
 
                     return function PostsNotFound() {
                         const element = util.stringToDOMElement(`
@@ -666,7 +735,7 @@ let handle = (function () {
 
                 let element;
 
-                function PhotoPosts() {
+                return function PhotoPosts() {
                     element = util.stringToDOMElement(`
                  <div class="posts" id="posts">
                  <div></div>
@@ -685,7 +754,7 @@ let handle = (function () {
                 PhotoPosts.update = function (id, post) {
                     const node = findNode(id);
                     if (node) {
-                        node.parentNode.replaceChild(PhotoPost({post}), node);
+                        node.parentNode.replaceChild(PhotoPost({ post }), node);
                     }
                 };
 
@@ -697,26 +766,26 @@ let handle = (function () {
                 };
 
                 PhotoPosts.render = function (posts) {
-                    util.removeChildren(element);
+                    removeChildren(element);
                     const wrapper = document.createElement('div');
                     if (posts.length === 0) {
                         wrapper.appendChild(PostsNotFound());
                     } else {
                         posts.forEach((post) => {
-                            wrapper.appendChild(PhotoPost({post}));
+                            wrapper.appendChild(PhotoPost({ post }));
                         });
                     }
                     element.appendChild(wrapper);
                 };
-
-                return PhotoPosts;
 
 
             })();
             /*************************************module*****************************************************************/
 
             /*Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter*/
-            let Filter = (function () {
+            let Filter = (function(){
+                //import handle from '../handlers';
+                //import { stringToDOMElement } from '../util';
 
                 return function Filter() {
                     const element = util.stringToDOMElement(`
@@ -763,21 +832,608 @@ let handle = (function () {
             /*************************************function*****************************************************************/
 
             return function Content() {
-                const {user} = getState();
+                const { user } = getState();
 
                 const element = util.stringToDOMElement(`
     <div class="content main-content">
       <aside class="sidebar">
         <ul class="menu menu-panel">
           <li class="menu__item">
-            <a href="#" class="bright">All posts</a>
+            <a href="#" class="bright">Impressions</a>
           </li>
           ${user ? `
           <li class="menu__item bright">
-            <a href="#" class="bright">Only my</a>
+            <a href="#" class="bright">My impressions</a>
           </li>
           <li class="menu__item bright">
-            <a href="#" class="bright">New post</a>
+            <a href="#" class="bright">New impression</a>
+          </li>`.trim() : ''}
+        </ul>
+      </aside>
+      <main class="main" id = "main">
+        <button class="show-more-button button">Load more...</button>
+      </main>
+    </div>
+  `.trim());
+
+                const menuItems = element.querySelector('.menu').children;
+                menuItems[0].onclick = () => handle({
+                    type: 'SHOW_POSTS',
+                });
+                if (menuItems.length > 1) {
+                    menuItems[1].onclick = () => handle({
+                        type: 'FILTER_POSTS',
+                        filterConfig: {
+                            author: user.name,
+                        },
+                    });
+                    menuItems[2].onclick = () => handle({
+                        type: 'CREATE_POST',
+                    });
+                }
+
+                const main = element.querySelector('#main');
+                main.insertBefore(PhotoPosts(), main.firstChild);
+                element.querySelector('.sidebar').appendChild(Filter());
+
+                element.querySelector('.show-more-button').onclick = () => {
+                    handle({
+                        type: 'SHOW_MORE_POSTS',
+                    });
+                };
+
+                handle({
+                    type: 'SHOW_POSTS',
+                });
+                return element;
+            }
+
+        })();
+        /*************************************function*****************************************************************/
+        /*Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer*/
+        let Footer = (function(){
+            //import { stringToDOMElement } from '../util';
+
+            return function Footer() {
+                return util.stringToDOMElement(`
+    <footer class="footer panel">
+      <span class="footer__description bright">
+        Impression by Simon Karasik,
+        <a class="footer__email" href="mailto:senich10@mail.ru">
+            senich10@mail.ru
+        </a>
+        ,&nbsp FAMCS, group 5
+      </span>
+      <span class="footer__update bright">
+        Last update:
+         <span id="update-date">19.02.18</span>
+      </span>
+    </footer>
+    `.trim());
+            }
+
+        })();
+        /*************************************function*****************************************************************/
+        /*Header Header Header Header Header Header Header Header Header HeaderHeader Header Header Header Header*/
+        let Header = (function(){
+            //import { stringToDOMElement } from '../util';
+            //import { getState } from '../state';
+            //import handle from '../handlers';
+            //import PhotoPosts from './PhotoPosts';
+            //import Filter from './Filter';
+
+            /*PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts*/
+            let PhotoPosts = (function(){
+                //import PhotoPost from './PhotoPost';
+                //import PostsNotFound from './PostsNotFound';
+
+                /*PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost*/
+                let PhotoPost = (function(){
+                    //import { stringToDOMElement, addClassIf } from '../util';
+                    //import handle from '../handlers';
+                    //import { getState } from '../state';
+                    /**
+                     * @param {PhotoPostModel} post
+                     * @param {Store} store
+                     */
+
+                    return function PhotoPost({ post }) {
+                        const { user } = getState();
+                        const pad = s => new String(s).padStart(2, '0');
+                        const formatDate = date => pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + pad(date.getFullYear() % 100);
+                        const makeTag = tag => `<a class="post__tag">${tag}</a>`;
+                        const makeTags = tags =>
+                            tags.reduce((s, tag) => s + makeTag(tag) + ' ', '');
+                        const isAuthor = user && post.author === user.name;
+                        const isLiked = user && post.likes.indexOf(user.name) !== -1;
+                        const element = util.stringToDOMElement(`
+    <div class="post">
+      <header class="post__header">
+       <span class="post__author">${post.author}</span>
+       <span class="post__header__right">
+         <span class="post__date">${formatDate(post.createdAt)}</span>&nbsp
+         <span class = ${util.addClassIf(!isAuthor, 'hidden')}>
+          <i class="material-icons icon-button post__header__edit">create</i>
+          <i class="material-icons icon-button post__header__remove">close</i>
+         </span>
+       </span>
+      </header>
+      <img class="post__photo" src="${post.photoLink}">
+      <footer class="post__footer">
+        <div class="post__like-panel">
+          <i class="material-icons post__like ${util.addClassIf(isLiked, 'post__like--liked')}">
+            ${isLiked ? 'favorite' : 'favorite_border'}
+          </i>
+         <span class="post__likes-count">${post.likes.length}</span>
+       </div>
+       <div class="post__information">
+         <div class="post__tags">
+          ${makeTags(post.tags)}
+         </div>
+         <p class="post__description">
+          ${post.description}
+         </p>
+       </div>
+      </footer>
+    </div>
+    `.trim());
+                        element.querySelector('.post__header__edit').onclick = () => {
+                            handle({
+                                type: 'EDIT_POST',
+                                id: post.id,
+                            });
+                        };
+                        element.querySelector('.post__header__remove').onclick = () => {
+                            handle({
+                                type: 'REMOVE_POST',
+                                id: post.id,
+                            });
+                        };
+                        element.querySelector('.post__like').onclick = () => {
+                            handle({
+                                type: 'LIKE_POST',
+                                id: post.id,
+                            });
+                        };
+                        element.setAttribute('data-id', post.id);
+                        return element;
+                    }
+
+                })();
+                /*************************************module*****************************************************************/
+
+                /*PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound*/
+                let PostsNotFound = (function(){
+                    //import { stringToDOMElement } from '../util';
+
+                    return function PostsNotFound() {
+                        const element = util.stringToDOMElement(`
+    <div class = "post posts-not-found">
+      No posts found.
+    </div>
+  `.trim());
+                        return element;
+                    }
+
+                })();
+                /*************************************function*****************************************************************/
+
+                let element;
+
+                return function PhotoPosts() {
+                    element = util.stringToDOMElement(`
+                 <div class="posts" id="posts">
+                 <div></div>
+                            </div>
+                                            `.trim());
+                    PhotoPosts.render([]);
+                    return element;
+                }
+
+                function findNode(id) {
+                    const posts = element.firstChild.children;
+                    const node = Array.prototype.find.call(posts, post => post.getAttribute('data-id') === id);
+                    return node;
+                }
+
+                PhotoPosts.update = function (id, post) {
+                    const node = findNode(id);
+                    if (node) {
+                        node.parentNode.replaceChild(PhotoPost({ post }), node);
+                    }
+                };
+
+                PhotoPosts.remove = function (id) {
+                    const node = findNode(id);
+                    if (node) {
+                        node.parentNode.removeChild(node);
+                    }
+                };
+
+                PhotoPosts.render = function (posts) {
+                    removeChildren(element);
+                    const wrapper = document.createElement('div');
+                    if (posts.length === 0) {
+                        wrapper.appendChild(PostsNotFound());
+                    } else {
+                        posts.forEach((post) => {
+                            wrapper.appendChild(PhotoPost({ post }));
+                        });
+                    }
+                    element.appendChild(wrapper);
+                };
+
+
+            })();
+            /*************************************module*****************************************************************/
+
+            /*Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter*/
+            let Filter = (function(){
+                //import handle from '../handlers';
+                //import { stringToDOMElement } from '../util';
+
+                return function Filter() {
+                    const element = util.stringToDOMElement(`
+    <form class="search menu-panel">
+      <span class="search__title bright">Filter</span>
+      <div class="search__panel">
+        <div class="search__option">
+        <input type="text" name="author" class="search__input" placeholder="By author">
+      </div>
+      <div class="search__option">
+        <label>From date</label>
+        <input type="date" name="fromDate" class="search__input">
+        <label>To date</label>
+        <input type="date" name="toDate" class="search__input">
+      </div>
+      <div class="search__option">
+        <input type="text" name="tags" class="search__input" placeholder="By tag">
+      </div>
+      <button class="search__button button">Filter</button>
+    </form>
+  `.trim());
+
+                    element.querySelector('.search__button').onclick = (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(element);
+                        const tags = formData.get('tags').split(/[#, ]/).filter(s => s !== '');
+                        const author = formData.get('author').trim();
+                        const fromDate = formData.get('fromDate') === '' ? null : new Date(formData.get('fromDate'));
+                        const toDate = formData.get('toDate') === '' ? null : new Date(formData.get('toDate'));
+                        handle({
+                            type: 'FILTER_POSTS',
+                            filterConfig: {
+                                fromDate,
+                                toDate,
+                                tags,
+                                author,
+                            },
+                        });
+                    };
+
+                    return element;
+                }
+            })();
+            /*************************************function*****************************************************************/
+
+            return function Content() {
+                const { user } = getState();
+
+                const element = util.stringToDOMElement(`
+    <div class="content main-content">
+      <aside class="sidebar">
+        <ul class="menu menu-panel">
+          <li class="menu__item">
+            <a href="#" class="bright">Impressions</a>
+          </li>
+          ${user ? `
+          <li class="menu__item bright">
+            <a href="#" class="bright">My impressions</a>
+          </li>
+          <li class="menu__item bright">
+            <a href="#" class="bright">New impression</a>
+          </li>`.trim() : ''}
+        </ul>
+      </aside>
+      <main class="main" id = "main">
+        <button class="show-more-button button">Load more...</button>
+      </main>
+    </div>
+  `.trim());
+
+                const menuItems = element.querySelector('.menu').children;
+                menuItems[0].onclick = () => handle({
+                    type: 'SHOW_POSTS',
+                });
+                if (menuItems.length > 1) {
+                    menuItems[1].onclick = () => handle({
+                        type: 'FILTER_POSTS',
+                        filterConfig: {
+                            author: user.name,
+                        },
+                    });
+                    menuItems[2].onclick = () => handle({
+                        type: 'CREATE_POST',
+                    });
+                }
+
+                const main = element.querySelector('#main');
+                main.insertBefore(PhotoPosts(), main.firstChild);
+                element.querySelector('.sidebar').appendChild(Filter());
+
+                element.querySelector('.show-more-button').onclick = () => {
+                    handle({
+                        type: 'SHOW_MORE_POSTS',
+                    });
+                };
+
+                handle({
+                    type: 'SHOW_POSTS',
+                });
+                return element;
+            }
+
+        })();
+        /*************************************function*****************************************************************/
+      //  import Content from './Content';
+      //  import Footer from './Footer';
+      //  import Header from './Header';
+        return function App() {
+            return [Header(), Content(), Footer()];
+        }
+    })();
+    /*************************************function*****************************************************************/
+
+    /*Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor*/
+    let Editor = (function(){
+      //  import { stringToDOMElement } from '../util';
+      //  import EditPost from './EditPost';
+     //  import Header from './Header';
+      //  import Footer from './Footer';
+
+        /*Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer*/
+        let Footer = (function(){
+            //import { stringToDOMElement } from '../util';
+
+            return function Footer() {
+                return util.stringToDOMElement(`
+    <footer class="footer panel">
+      <span class="footer__description bright">
+        Impression by Simon Karasik,
+        <a class="footer__email" href="mailto:senich10@mail.ru">
+            senich10@mail.ru
+        </a>
+        ,&nbsp FAMCS, group 5
+      </span>
+      <span class="footer__update bright">
+        Last update:
+         <span id="update-date">19.02.18</span>
+      </span>
+    </footer>
+    `.trim());
+            }
+
+        })();
+        /*************************************function*****************************************************************/
+
+        /*Header Header Header Header Header Header Header Header Header HeaderHeader Header Header Header Header*/
+        let Header = (function(){
+            //import { stringToDOMElement } from '../util';
+            //import { getState } from '../state';
+            //import handle from '../handlers';
+            //import PhotoPosts from './PhotoPosts';
+            //import Filter from './Filter';
+
+            /*PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts PhotoPosts*/
+            let PhotoPosts = (function(){
+                //import PhotoPost from './PhotoPost';
+                //import PostsNotFound from './PostsNotFound';
+
+                /*PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost*/
+                let PhotoPost = (function(){
+                    //import { stringToDOMElement, addClassIf } from '../util';
+                    //import handle from '../handlers';
+                    //import { getState } from '../state';
+                    /**
+                     * @param {PhotoPostModel} post
+                     * @param {Store} store
+                     */
+
+                    return function PhotoPost({ post }) {
+                        const { user } = getState();
+                        const pad = s => new String(s).padStart(2, '0');
+                        const formatDate = date => pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + pad(date.getFullYear() % 100);
+                        const makeTag = tag => `<a class="post__tag">${tag}</a>`;
+                        const makeTags = tags =>
+                            tags.reduce((s, tag) => s + makeTag(tag) + ' ', '');
+                        const isAuthor = user && post.author === user.name;
+                        const isLiked = user && post.likes.indexOf(user.name) !== -1;
+                        const element = util.stringToDOMElement(`
+    <div class="post">
+      <header class="post__header">
+       <span class="post__author">${post.author}</span>
+       <span class="post__header__right">
+         <span class="post__date">${formatDate(post.createdAt)}</span>&nbsp
+         <span class = ${util.addClassIf(!isAuthor, 'hidden')}>
+          <i class="material-icons icon-button post__header__edit">create</i>
+          <i class="material-icons icon-button post__header__remove">close</i>
+         </span>
+       </span>
+      </header>
+      <img class="post__photo" src="${post.photoLink}">
+      <footer class="post__footer">
+        <div class="post__like-panel">
+          <i class="material-icons post__like ${util.addClassIf(isLiked, 'post__like--liked')}">
+            ${isLiked ? 'favorite' : 'favorite_border'}
+          </i>
+         <span class="post__likes-count">${post.likes.length}</span>
+       </div>
+       <div class="post__information">
+         <div class="post__tags">
+          ${makeTags(post.tags)}
+         </div>
+         <p class="post__description">
+          ${post.description}
+         </p>
+       </div>
+      </footer>
+    </div>
+    `.trim());
+                        element.querySelector('.post__header__edit').onclick = () => {
+                            handle({
+                                type: 'EDIT_POST',
+                                id: post.id,
+                            });
+                        };
+                        element.querySelector('.post__header__remove').onclick = () => {
+                            handle({
+                                type: 'REMOVE_POST',
+                                id: post.id,
+                            });
+                        };
+                        element.querySelector('.post__like').onclick = () => {
+                            handle({
+                                type: 'LIKE_POST',
+                                id: post.id,
+                            });
+                        };
+                        element.setAttribute('data-id', post.id);
+                        return element;
+                    }
+
+                })();
+                /*************************************module*****************************************************************/
+
+                /*PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound PostsNotFound*/
+                let PostsNotFound = (function(){
+                    //import { stringToDOMElement } from '../util';
+
+                    return function PostsNotFound() {
+                        const element = util.stringToDOMElement(`
+    <div class = "post posts-not-found">
+      No posts found.
+    </div>
+  `.trim());
+                        return element;
+                    }
+
+                })();
+                /*************************************function*****************************************************************/
+
+                let element;
+
+                return function PhotoPosts() {
+                    element = util.stringToDOMElement(`
+                 <div class="posts" id="posts">
+                 <div></div>
+                            </div>
+                                            `.trim());
+                    PhotoPosts.render([]);
+                    return element;
+                }
+
+                function findNode(id) {
+                    const posts = element.firstChild.children;
+                    const node = Array.prototype.find.call(posts, post => post.getAttribute('data-id') === id);
+                    return node;
+                }
+
+                PhotoPosts.update = function (id, post) {
+                    const node = findNode(id);
+                    if (node) {
+                        node.parentNode.replaceChild(PhotoPost({ post }), node);
+                    }
+                };
+
+                PhotoPosts.remove = function (id) {
+                    const node = findNode(id);
+                    if (node) {
+                        node.parentNode.removeChild(node);
+                    }
+                };
+
+                PhotoPosts.render = function (posts) {
+                    removeChildren(element);
+                    const wrapper = document.createElement('div');
+                    if (posts.length === 0) {
+                        wrapper.appendChild(PostsNotFound());
+                    } else {
+                        posts.forEach((post) => {
+                            wrapper.appendChild(PhotoPost({ post }));
+                        });
+                    }
+                    element.appendChild(wrapper);
+                };
+
+
+            })();
+            /*************************************module*****************************************************************/
+
+            /*Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter Filter*/
+            let Filter = (function(){
+                //import handle from '../handlers';
+                //import { stringToDOMElement } from '../util';
+
+                return function Filter() {
+                    const element = util.stringToDOMElement(`
+    <form class="search menu-panel">
+      <span class="search__title bright">Filter</span>
+      <div class="search__panel">
+        <div class="search__option">
+        <input type="text" name="author" class="search__input" placeholder="By author">
+      </div>
+      <div class="search__option">
+        <label>From date</label>
+        <input type="date" name="fromDate" class="search__input">
+        <label>To date</label>
+        <input type="date" name="toDate" class="search__input">
+      </div>
+      <div class="search__option">
+        <input type="text" name="tags" class="search__input" placeholder="By tag">
+      </div>
+      <button class="search__button button">Filter</button>
+    </form>
+  `.trim());
+
+                    element.querySelector('.search__button').onclick = (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(element);
+                        const tags = formData.get('tags').split(/[#, ]/).filter(s => s !== '');
+                        const author = formData.get('author').trim();
+                        const fromDate = formData.get('fromDate') === '' ? null : new Date(formData.get('fromDate'));
+                        const toDate = formData.get('toDate') === '' ? null : new Date(formData.get('toDate'));
+                        handle({
+                            type: 'FILTER_POSTS',
+                            filterConfig: {
+                                fromDate,
+                                toDate,
+                                tags,
+                                author,
+                            },
+                        });
+                    };
+
+                    return element;
+                }
+            })();
+            /*************************************function*****************************************************************/
+
+            return function Content() {
+                const { user } = getState();
+
+                const element = util.stringToDOMElement(`
+    <div class="content main-content">
+      <aside class="sidebar">
+        <ul class="menu menu-panel">
+          <li class="menu__item">
+            <a href="#" class="bright">Impressions</a>
+          </li>
+          ${user ? `
+          <li class="menu__item bright">
+            <a href="#" class="bright">My impressions</a>
+          </li>
+          <li class="menu__item bright">
+            <a href="#" class="bright">New impression</a>
           </li>`.trim() : ''}
         </ul>
       </aside>
@@ -822,145 +1478,10 @@ let handle = (function () {
         })();
         /*************************************function*****************************************************************/
 
-        /*Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer*/
-        let Footer = (function () {
-
-            return function Footer() {
-                return util.stringToDOMElement(`
-    <footer class="footer panel">
-      <span class="footer__description bright">
-        Created by Kuzmich Alexandr, 2-nd year student from FAMCS
-        <a class="footer__email" href="mailto:senich10@mail.ru">
-            AlexandrWh
-        </a>
-      </span>
-      <span class="footer__update bright">
-        Last update:
-         <span id="update-date">13.05.18</span>
-      </span>
-    </footer>
-    `.trim());
-            }
-
-        })();
-        /*************************************function*****************************************************************/
-
-        /*Header Header Header Header Header Header Header Header Header HeaderHeader Header Header Header Header*/
-        let Header = (function () {
-
-            return function Header() {
-                let user = getState().user || {
-                    name: 'Guest',
-                    avatarLink: 'user_icon.png',
-                };
-                user.avatarLink = user.avatarLink || 'user_icon.png';
-
-                const element = util.stringToDOMElement(`
-    <header class="header panel">
-      <div class="header__user-wrapper header__sideblock header__user">
-        <img class="header__user__avatar" src="${user.avatarLink}"> &nbsp
-        <span class="header__user__name">${user.name}</span>
-      </div>
-      <h1 class="header__title">MONOGRAM</h1>
-      <div class="header__sideblock header__logout-wrapper">
-        <a class="header__logout">
-          <i class="material-icons icon-button">exit_to_app</i>
-        </a>
-      </div>
-    </header>
-  `.trim());
-
-                element.querySelector('.header__logout').onclick = () => {
-                    handle({
-                        type: 'LOGOUT',
-                    });
-                    handle({
-                        type: 'SET_PAGE',
-                        pageName: 'signIn',
-                    });
-                };
-
-                return element;
-            }
-
-        })();
-        /*************************************function*****************************************************************/
-
-        return function App() {
-            return [Header(), Content(), Footer()];
-        }
-    })();
-    /*************************************function*****************************************************************/
-
-    /*Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor Editor*/
-    let Editor = (function () {
-
-        /*Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer Footer*/
-        let Footer = (function () {
-
-            return function Footer() {
-                return util.stringToDOMElement(`
-    <footer class="footer panel">
-      <span class="footer__description bright">
-        Created by Kuzmich Alexandr, 2-nd year student from FAMCS
-        <a class="footer__email" href="mailto:senich10@mail.ru">
-            AlexandrWh
-        </a>
-      </span>
-      <span class="footer__update bright">
-        Last update:
-         <span id="update-date">13.05.18</span>
-      </span>
-    </footer>
-    `.trim());
-            }
-
-        })();
-        /*************************************function*****************************************************************/
-
-        /*Header Header Header Header Header Header Header Header Header HeaderHeader Header Header Header Header*/
-        let Header = (function () {
-
-            return function Header() {
-                let user = getState().user || {
-                    name: 'Guest',
-                    avatarLink: 'user_icon.png',
-                };
-                user.avatarLink = user.avatarLink || 'user_icon.png';
-
-                const element = util.stringToDOMElement(`
-    <header class="header panel">
-      <div class="header__user-wrapper header__sideblock header__user">
-        <img class="header__user__avatar" src="${user.avatarLink}"> &nbsp
-        <span class="header__user__name">${user.name}</span>
-      </div>
-      <h1 class="header__title">MONOGRAM</h1>
-      <div class="header__sideblock header__logout-wrapper">
-        <a class="header__logout">
-          <i class="material-icons icon-button">exit_to_app</i>
-        </a>
-      </div>
-    </header>
-  `.trim());
-
-                element.querySelector('.header__logout').onclick = () => {
-                    handle({
-                        type: 'LOGOUT',
-                    });
-                    handle({
-                        type: 'SET_PAGE',
-                        pageName: 'signIn',
-                    });
-                };
-
-                return element;
-            }
-
-        })();
-        /*************************************function*****************************************************************/
-
         /*EditPost EditPost EditPost EditPost EditPost EditPost EditPost EditPost EditPost EditPost EditPost EditPost*/
-        let EditPost = (function () {
+        let EditPost = (function(){
+            //import { stringToDOMElement } from '../util';
+           // import handle from '../handlers';
 
             function makeTag(tag) {
                 const element = util.stringToDOMElement(`
@@ -1119,8 +1640,8 @@ let handle = (function () {
     /*************************************function*****************************************************************/
 
     /*PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel PhotoPostsModel*/
-    let PhotoPostsModel = (function () {
-        return class PhotoPosts {
+    let PhotoPostsModel = (function(){
+        return default class PhotoPosts {
             constructor() {
                 this.photoPosts = [];
                 this.isSorted = true;
@@ -1132,7 +1653,13 @@ let handle = (function () {
                 return posts;
             }
 
-            getPhotoPosts(skip = 0, top = 10, filterConfig) {
+            /**
+             * @param {number} skip
+             * @param {number} top
+             * @param {{author? : String, fromDate? : Date, toDate? : Date, tags? : [String]}} filterConfig
+             * @returns {[PhotoPost]}
+             */
+           getPhotoPosts (skip = 0, top = 10, filterConfig) {
                 if (!this.isSorted) {
                     this.photoPosts.sort((p1, p2) => p1.createdAt < p2.createdAt);
                     this.isSorted = true;
@@ -1162,16 +1689,27 @@ let handle = (function () {
                 return result;
             }
 
+            /**
+             * @param {PhotoPost} post
+             * @returns {Boolean} success / failure
+             */
             addPhotoPost(post) {
                 this.photoPosts.push(post);
                 this.isSorted = false;
                 return post;
             }
 
+            /**
+             * @param {String} id
+             * @returns {PhotoPost | null} Returns post with such id or null if not found.
+             */
             getPhotoPost(id) {
                 return this.photoPosts.find(post => post.id === id) || null;
             }
 
+            /**
+             * @returns {Boolean} success / failure
+             */
             editPhotoPost(id, fieldsToEdit) {
                 const ind = this.photoPosts.findIndex(post => post.id === id);
                 if (ind === -1) {
@@ -1181,6 +1719,10 @@ let handle = (function () {
                 return true;
             }
 
+            /**
+             * @param {String} id
+             * @returns {Boolean} success / failure
+             */
             removePhotoPost(id) {
                 const ind = this.photoPosts.findIndex(post => post.id === id);
                 if (ind === -1) {
@@ -1192,8 +1734,14 @@ let handle = (function () {
         }
 
     })();
-
     /*************************************module*****************************************************************/
+
+  //  import PhotoPosts from './components/PhotoPosts';
+  //  import PageNotFound from './components/PageNotFound';
+   // import SignIn from './components/SignIn';
+   // import App from './components/App';
+   // import Editor from './components/Editor';
+   // import { default as PhotoPostsModel } from './models/PhotoPosts';
 
     function clearPostsViewConfig() {
         getState().postsInViewCnt = 0;
@@ -1201,8 +1749,7 @@ let handle = (function () {
     }
 
     function setPage(pageName, args) {
-        util.removeChildren(document.body);
-        //console.log(document.body);
+        removeChildren(document.body);
         clearPostsViewConfig();
         let page = null;
         switch (pageName) {
@@ -1211,7 +1758,6 @@ let handle = (function () {
                 break;
             case 'app':
                 page = App();
-                //   console.log(page);
                 break;
             case 'editor':
                 page = Editor(args);
@@ -1219,17 +1765,17 @@ let handle = (function () {
             default:
                 page = PageNotFound();
         }
-        util.render(page, document.body);
+        render(page, document.body);
     }
 
     function showPosts() {
-        const {posts, postsInViewCnt, filterConfig} = getState();
+        const { posts, postsInViewCnt, filterConfig } = getState();
         const postsToShow = posts.getPhotoPosts(0, postsInViewCnt, filterConfig);
         PhotoPosts.render(postsToShow);
     }
 
     function loadMorePostsIfNeeded(wantedPostsCnt) {
-        const {filterConfig} = getState();
+        const { filterConfig } = getState();
         const availablePosts = getState().posts.getPhotoPosts(0, wantedPostsCnt, filterConfig);
         const availablePostsCnt = availablePosts.length;
         if (availablePostsCnt < wantedPostsCnt) {
@@ -1289,8 +1835,7 @@ let handle = (function () {
             getState().posts.editPhotoPost(post.id, post);
         } else {
             postToSave.author = getState().user.name;
-            const post = await api.createPost(postToSave);
-            getState().posts.addPhotoPost(postToSave);
+            getState().posts.addPhotoPost(post);
             setPage('app');
         }
     }
@@ -1332,9 +1877,6 @@ let handle = (function () {
                 removePost(action.id);
                 break;
             case 'CREATE_POST':
-                //  console.log(1);
-                initialState.id = document.getElementsByClassName('data-id');
-                console.log(initialState.id);
                 createPost();
                 break;
             case 'FILTER_POSTS':
@@ -1349,7 +1891,6 @@ let handle = (function () {
                 editPost(action.id);
                 break;
             case 'SAVE_POST':
-                console.log(action.post);
                 savePost(action.post);
                 break;
             case 'SHOW_MORE_POSTS':
@@ -1359,7 +1900,6 @@ let handle = (function () {
                 setPage('app');
                 break;
             case 'SET_PAGE':
-                // console.log(document.body);
                 setPage(action.pageName);
                 break;
             case 'LOGIN':
@@ -1371,27 +1911,22 @@ let handle = (function () {
             default:
                 break;
         }
-    }
-
-    return {
+    }return{
         handle
-    }
-})();
+    }})();
 /******************************************************************************************************/
 
 const initialState = {
-    posts: PhotoPostsModel.fromArray([]),
-    filterConfig: null,
-    postsInViewCnt: 0,
-    user: null,
-    postsPerPage: 10,
+  posts: PhotoPostsModel.fromArray([]),
+  filterConfig: null,
+  postsInViewCnt: 0,
+  user: null,
+  postsPerPage: 10,
 };
 
-setState(initialState);
+state.setState(initialState);
 
 handle.handle({
-    type: 'SET_PAGE',
-    pageName: 'app',
+  type: 'SET_PAGE',
+  pageName: 'app',
 });
-
-
