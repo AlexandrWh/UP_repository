@@ -89,11 +89,17 @@ class PhotoPosts {
   * @returns {Boolean} success / failure
   */
   editPhotoPost(id, { description, tags, photoLink }) {
+     // console.log(description);
+    //  console.log(id);
+    //  console.log(tags);
+    //  console.log(photoLink);
     const ind = this.photoPosts.findIndex(post => post.id === id);
+    //console.log(ind);
     if (ind === -1) {
       return false;
     }
     const editedPost = Object.assign(new PhotoPost({}), this.photoPosts[ind]);
+    //console.log(editedPost);
     if (typeof photoLink !== 'undefined') {
       editedPost.photoLink = photoLink;
     }
@@ -103,9 +109,7 @@ class PhotoPosts {
     if (typeof description !== 'undefined') {
       editedPost.description = description;
     }
-    if (!PhotoPost.validate(editedPost)) {
-      return false;
-    }
+    console.log(5);
     this.photoPosts[ind] = editedPost;
     return editedPost;
   }

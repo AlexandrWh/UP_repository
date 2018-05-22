@@ -1133,6 +1133,7 @@ let handle = (function () {
             }
 
             getPhotoPosts(skip = 0, top = 10, filterConfig) {
+                console.log(filterConfig);
                 if (!this.isSorted) {
                     this.photoPosts.sort((p1, p2) => p1.createdAt < p2.createdAt);
                     this.isSorted = true;
@@ -1163,7 +1164,11 @@ let handle = (function () {
             }
 
             addPhotoPost(post) {
-                this.photoPosts.push(post);
+                let arr = [];
+                arr.push(post);
+                let p = this.photoPosts;
+                this.photoPosts = arr.concat(p);
+                //this.photoPosts.push(post);
                 this.isSorted = false;
                 return post;
             }
@@ -1266,6 +1271,7 @@ let handle = (function () {
     function filterPosts(filterConfig) {
         clearPostsViewConfig();
         getState().filterConfig = filterConfig;
+        console.log(filterConfig);
         loadMorePostsIfNeededAndShow(getState().postsPerPage);
     }
 
@@ -1285,8 +1291,13 @@ let handle = (function () {
 
     async function savePost(postToSave) {
         if (postToSave.id) {
+            console.log(postToSave);
             const post = await api.updatePost(postToSave.id, postToSave);
+            console.log(1);
             getState().posts.editPhotoPost(post.id, post);
+            console.log(2);
+            setPage('app');
+            console.log(3);
         } else {
             postToSave.author = getState().user.name;
             const post = await api.createPost(postToSave);
@@ -1349,7 +1360,7 @@ let handle = (function () {
                 editPost(action.id);
                 break;
             case 'SAVE_POST':
-                console.log(action.post);
+                //console.log(action.post);
                 savePost(action.post);
                 break;
             case 'SHOW_MORE_POSTS':

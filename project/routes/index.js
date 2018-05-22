@@ -77,6 +77,7 @@ router.post('/posts', upload.single('photoFile'), parseFormData, (req, res) => {
 
 router.put('/posts/:id', upload.single('photoFile'), parseFormData, (req, res) => {
   const oldPost = postsController.getPost(req.params.id);
+  //console.log(oldPost);
   if (!oldPost) {
     return res.sendStatus(404);
   }

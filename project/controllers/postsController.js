@@ -33,6 +33,8 @@ function createPost(post) {
 }
 
 function updatePost(id, fields) {
+  //console.log(id);
+  //console.log(fields);
   if (posts.editPhotoPost(id, fields)) {
     updateFile();
     return posts.getPhotoPost(id);
