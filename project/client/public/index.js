@@ -102,10 +102,8 @@ let util = (function () {
 
     function render(elements, wrapper) {
         if (!Array.isArray(elements)) {
-
             elements = [elements];
         }
-
         elements.forEach(element => wrapper.appendChild(element));
         return wrapper;
     }
@@ -213,7 +211,6 @@ let handle = (function () {
             }
 
         })();
-
         /*************************************module*****************************************************************/
 
         function buildRequest(url, params = {}) {
@@ -1237,12 +1234,16 @@ let handle = (function () {
         const {filterConfig} = getState();
         const availablePosts = getState().posts.getPhotoPosts(0, wantedPostsCnt, filterConfig);
         const availablePostsCnt = availablePosts.length;
+        //console.log(getState().posts);
         if (availablePostsCnt < wantedPostsCnt) {
-            return api.getPosts(availablePostsCnt, wantedPostsCnt - availablePostsCnt, filterConfig)
+            let p =  api.getPosts(availablePostsCnt, wantedPostsCnt - availablePostsCnt, filterConfig)
                 .then((posts) => {
                     posts.forEach(post => getState().posts.addPhotoPost(post));
                     return availablePostsCnt + posts.length;
                 });
+            //console.log(getState().posts);
+            //console.log(p);
+            return p;
         }
         return Promise.resolve(wantedPostsCnt);
     }
@@ -1291,15 +1292,12 @@ let handle = (function () {
 
     async function savePost(postToSave) {
         if (postToSave.id) {
-            console.log(postToSave);
             const post = await api.updatePost(postToSave.id, postToSave);
-            console.log(1);
             getState().posts.editPhotoPost(post.id, post);
-            console.log(2);
             setPage('app');
-            console.log(3);
         } else {
             postToSave.author = getState().user.name;
+            postToSave.id = (Number.parseInt(getState().posts.photoPosts[0].id) + 1).toString();
             const post = await api.createPost(postToSave);
             getState().posts.addPhotoPost(postToSave);
             setPage('app');

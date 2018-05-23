@@ -22,8 +22,6 @@ function updateFile() {
 function createPost(post) {
   post.createdAt = new Date();
   if(!post.tags) post.tags = [];
-  let p = (1 + posts.getArray()[0].id);
-  post.id = "" + p;
   const createdPost = posts.addPhotoPost(post);
   if (createdPost) {
     updateFile();
