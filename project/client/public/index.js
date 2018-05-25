@@ -43,6 +43,7 @@ let PhotoPostsModel = (function () {
                     result.push(post);
                 }
             }
+            result.sort((p1, p2) => Number.parseInt(p1.createdAt) < Number.parseInt(p2.createdAt));
             return result;
         }
 
@@ -337,9 +338,6 @@ let handle = (function () {
 
         /*PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost PhotoPost*/
         let PhotoPost = (function () {
-            //import { stringToDOMElement, addClassIf } from '../util';
-            //import handle from '../handlers';
-            //import { getState } from '../state';
 
             return function PhotoPost({post}) {
                 post.tags = post.tags.toString();
@@ -1015,6 +1013,9 @@ let handle = (function () {
     </div>
   `.trim());
                 const tagsWrapper = element.querySelector('#tags');
+                if(typeof post.tags === 'string'){
+                    post.tags = post.tags.split(",").slice(1);
+                }
                 post.tags.forEach(tag => tagsWrapper.appendChild(makeTag(tag)));
 
                 let state = {
@@ -1157,6 +1158,7 @@ let handle = (function () {
                         result.push(post);
                     }
                 }
+                result.sort((p1, p2) => Number.parseInt(p1.createdAt) < Number.parseInt(p2.createdAt));
                 return result;
             }
 
@@ -1230,26 +1232,26 @@ let handle = (function () {
         PhotoPosts.render(postsToShow);
     }
 
-    function loadMorePostsIfNeeded(wantedPostsCnt) {
+    async function loadMorePostsIfNeeded(wantedPostsCnt) {
         const {filterConfig} = getState();
         const availablePosts = getState().posts.getPhotoPosts(0, wantedPostsCnt, filterConfig);
         const availablePostsCnt = availablePosts.length;
-        //console.log(getState().posts);
         if (availablePostsCnt < wantedPostsCnt) {
             let p =  api.getPosts(availablePostsCnt, wantedPostsCnt - availablePostsCnt, filterConfig)
                 .then((posts) => {
                     posts.forEach(post => getState().posts.addPhotoPost(post));
                     return availablePostsCnt + posts.length;
                 });
-            //console.log(getState().posts);
-            //console.log(p);
             return p;
         }
         return Promise.resolve(wantedPostsCnt);
     }
 
     async function loadMorePostsIfNeededAndShow(wantedPostsCnt) {
+        console.log(getState().posts);
+        getState().posts.photoPosts = [];
         const availablePostsCnt = await loadMorePostsIfNeeded(wantedPostsCnt);
+        console.log(getState().posts);
         getState().postsInViewCnt = availablePostsCnt;
         showPosts();
     }
@@ -1272,7 +1274,6 @@ let handle = (function () {
     function filterPosts(filterConfig) {
         clearPostsViewConfig();
         getState().filterConfig = filterConfig;
-        console.log(filterConfig);
         loadMorePostsIfNeededAndShow(getState().postsPerPage);
     }
 
