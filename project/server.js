@@ -2,6 +2,7 @@ const express = require('express');
 const router = require('./routes');
 const logger = require('morgan')('dev');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const PORT = 8080;
 const staticPath = `${__dirname}/client/public`;
@@ -16,13 +17,12 @@ app.use((req, res) => {
   res.status(404).sendFile(`${staticPath}/error.html`);
 });
 
-const mongoose = require('mongoose');
 mongoose.connect(`mongod://localhost:27017`,(err)=> {
     if(err) throw err;
     console.log('Successfully connected to database')
 })
 
-const photopostDB = require('mongo.js');
+const photopostDB = require('./mongo.js');
 photopostDB.addPhotoPost({
     "id": "4",
     "description": "            4444444444444444444444\r\n            \r\n            ",

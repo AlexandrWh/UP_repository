@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
-
-const User = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     login: {type:String},
     password: {type:String},
-    posts: {type:Array}
 });
 
+const User = mongoose.model('users',UserSchema);
+
 function addUser() {
+
+}
+
+function getUser() {
 
 }

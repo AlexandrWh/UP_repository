@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-
-const PhotoPost = new mongoose.Schema({
+const PhotoPostSchema = new mongoose.Schema({
     id: {type:String},
     description: {type:String},
     createdAt: {type:Date},
@@ -10,32 +9,25 @@ const PhotoPost = new mongoose.Schema({
     tags: {type:String}
 });
 
+const PhotoPost = mongoose.model('photoposts',PhotoPostSchema);
+
 module.exports = {
     addPhotoPost
 };
 
 function addPhotoPost(post) {
-    return PhotoPost.findOne({id: post.id}).then((photopost)=>{
+    return PhotoPost.findOne({id: post.id}).then(photopost=>{
         if(!photopost){
-            photopost = new PhotoPost({
-                id: {type:String},
-                description: {type:String},
-                createdAt: {type:Date},
-                author: {type:String},
-                photoLink: {type:String},
-                likes: {type:Array},
-                tags: {type:String}
-                });
-            return photopost.save();
-        }
-    })
+        photopost = new PhotoPost(post);
+        return photopost.save();
+    }
+})
 }
 
-function rePhotoPost(id, content) {
+/*function editPhotoPost(id, content) {
 
 }
 
 function deletePhotoPost(id) {
 
-}
-
+}*/
